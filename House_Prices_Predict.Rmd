@@ -21,21 +21,21 @@ library(data.table) # to ?????????
 # Download the data
 
 ```{r}
-train.df <- read_csv("~/Desktop/ProjectR/DataBase/trainhouseprices.csv")
-test.df <- read_csv("~/Desktop/ProjectR/DataBase/testhouseprices.csv")
+train.df <- read_csv("trainhouseprices.csv")
+test.df <- read_csv("testhouseprices.csv")
 
-train.df$TrainData <- TRUE 
+train.df$TrainData <- TRUE
 test.df$TrainData <- FALSE
 ```
 
 ```{r}
-#str(train.df)
+str(train.df)
 ```
 
 We can see that train.df contains 82 variables.
 
 ```{r}
-#str(test.df)
+str(test.df)
 ```
 
 test.df contains only 81 variables, one less than train.df, we see that it is the variable SalePrice that is missing.
@@ -164,3 +164,4 @@ full.df <- full.df[order(full.df$Id),]
 ```
 
 Vic Test
+ 
