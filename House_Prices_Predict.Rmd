@@ -163,5 +163,30 @@ full.df[,LotFrontage := ifelse(is.na(LotFrontage), median(LotFrontage, na.rm=TRU
 full.df <- full.df[order(full.df$Id),]
 ```
 
-Test 2
+Regarder maintenant pour les valeurs manquantes concernant les garages
+
+Pour GarageType, la valeur NA indique l'absence de garage. Il faut donc regarder pour les autres variables garages si l'absence d'informations provient de l'absence d'un garage.
+
+Nombre de valeurs manquantes pour les variables rattachées au Garage :
+
+GarageType	157			
+GarageYrBlt	159			
+GarageFinish	159			
+GarageCars	1			
+GarageArea	1			
+GarageQual	159			
+GarageCond	159
+
+Dans un premier temps, nous indiquons "Abs" lorsque la valeur NA est présente sur la variable GarageType.
+
+```{r}
+full.df$GarageType[is.na(full.df$GarageType)] = "Abs"
+```
+
+Ensuite nous créons un jeu de données avec l'ensemble des variables Garage (voir si c'est pertinent)
+
+```{r}
+GarageVariable <- full.df[,c("GarageType", "GarageYrBlt", "GarageFinish", "GarageQual", "GarageCond")]
+```
+
 
