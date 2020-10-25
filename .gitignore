@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+data_description.txt
+sample_submission.csv
+testhouseprices.csv
+trainhouseprices.csv
