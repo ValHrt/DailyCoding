@@ -2,5 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
 trainhouseprices.csv
 testhouseprices.csv
+=======
+testhouseprices.csv
+trainhouseprices.csv
+>>>>>>> 13d53f116d8b695fa207b8eed639b2a55b5386f9

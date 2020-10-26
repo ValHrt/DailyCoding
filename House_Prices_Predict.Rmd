@@ -16,13 +16,14 @@ library(readr) # download the data
 library(caret) # to perform RF model
 library(naniar) # to visualize missing data
 library(data.table) # to ?????????
+library(corrr) # pour les corrélations entre variables
 ```
 
 # Download the data
 
 ```{r}
-train.df <- read_csv("~/Desktop/ProjectR/DataBase/trainhouseprices.csv")
-test.df <- read_csv("~/Desktop/ProjectR/DataBase/testhouseprices.csv")
+train.df <- read_csv("trainhouseprices.csv")
+test.df <- read_csv("testhouseprices.csv")
 
 train.df$TrainData <- TRUE 
 test.df$TrainData <- FALSE
@@ -163,5 +164,121 @@ full.df[,LotFrontage := ifelse(is.na(LotFrontage), median(LotFrontage, na.rm=TRU
 full.df <- full.df[order(full.df$Id),]
 ```
 
-Test 1
+Regarder maintenant pour les valeurs manquantes concernant les garages
 
+Pour GarageType, la valeur NA indique l'absence de garage. Il faut donc regarder pour les autres variables garages si l'absence d'informations provient de l'absence d'un garage.
+
+Nombre de valeurs manquantes pour les variables rattachées au Garage :
+
+GarageType	157			
+GarageYrBlt	159			
+GarageFinish	159			
+GarageCars	1			
+GarageArea	1			
+GarageQual	159			
+GarageCond	159
+
+Dans un premier temps, nous indiquons "Abs" lorsque la valeur NA est présente sur la variable GarageType.
+
+```{r}
+full.df$GarageType[is.na(full.df$GarageType)] = "Abs"
+```
+
+Ensuite nous créons un jeu de données avec l'ensemble des variables Garage (voir si c'est pertinent)
+
+```{r}
+full.df[full.df$GarageType=="Abs", c("GarageYrBlt", 'GarageQual', 'GarageCond', 'GarageFinish')]
+```
+Nous pouvons voir que parmi toutes les valeurs Abs pour la variable GarageType, les variables GarageYrBlt, GarageQual, GarageCond et GarageFinish affichent une valeur "NA". Ainsi, nous allons pouvoir remplacer ces NA par la valeur Abs.
+
+```{r}
+full.df$GarageYrBlt[is.na(full.df$GarageYrBlt)] = "Abs"
+full.df$GarageQual[is.na(full.df$GarageQual)] = "Abs"
+full.df$GarageCond[is.na(full.df$GarageCond)] = "Abs"
+full.df$GarageFinish[is.na(full.df$GarageFinish)] = "Abs"
+```
+
+Les variables GarageCars et GarageArea comptent chacune une valeur NA, nous allons vérifier si cette valeur NA correspond à l'absence de garage ou s'il s'agit d'une erreur de saisie lors de la création du jeu de données.
+
+```{r}
+which(is.na(full.df$GarageCars), arr.ind=TRUE)
+which(is.na(full.df$GarageArea), arr.ind=TRUE)
+```
+
+Nous pouvons voir que les 2 valeurs manquantes pour les 2 variables se trouvent sur la même ligne, la ligne 2577.
+
+```{r}
+full.df[2577]
+```
+
+Sur la ligne 2577, toutes les variables relatives au Garage indiquent l'absence d'un garage excepté pour la variable GarageType qui indique "Detchd", nous pouvons donc conclure qu'il s'agit d'une erreur de saisie et que cette valeur devrait être "Abs" au lieu de "Detchd".
+
+```{r}
+full.df$GarageType[2577] <- "Abs"
+full.df$GarageCars[is.na(full.df$GarageCars)] = "Abs"
+full.df$GarageArea[is.na(full.df$GarageArea)] = "Abs"
+```
+
+Il va maintenant falloir passer aux variables Bsmt (sous-sol)
+
+### Valeurs manquantes MasVnrArea/MasVnrType
+
+```{r}
+summary(full.df$MasVnrArea)
+```
+
+La moyenne de la variable MasVnrArea (qui indique la surface de placage sur les façades) est de 102.2m² alors que la médiane est de 0, donc au moins la moitié des valeurs pour cette variable sont nulles, vérifions s'il s'agit d'une erreur.
+
+```{r}
+full.df$MasVnrArea <- as.numeric(full.df$MasVnrArea)
+table(full.df$MasVnrArea==0, full.df$MasVnrType) # à envoyer à Vic
+```
+
+Après avoir filtré la base de données pour ne garder que les habitations qui ont une valeur MasVnrArea égale à zéro, on remarque qu'il y a une corrélation entre les variables MasVnrArea et MasVnrType (qui indique le type de placage) : pour toutes les habitations qui ont une valeur MasVnrArea nulle, la variable MasVnrType indique "None". Donc il ne s'aggit pas d'une erreur puisque les valeurs nulles correspondent aux habitations dont les façades ne possèdent pas de placage). Néanmoins, il y a 3 valeurs pour lesquelles MasVnrArea indique 0 alors que MasVnrType indique BrkFace ou Stone. Nous allons donc chercher ces 3 valeurs dans un premier temps.
+ 
+```{r}
+which(full.df$MasVnrArea==0 & full.df$MasVnrType=="BrkFace", arr.ind=TRUE)
+which(full.df$MasVnrArea==0 & full.df$MasVnrType=="Stone", arr.ind=TRUE)
+```
+
+Nous remarquons que les lignes qui posent problème sont les suivantes : 689 / 2320 et 1242.
+Nous allons chercher parmi les variables numériques s'il existe une corrélation avec MasVnrArea.
+
+```{r}
+full.df %>% 
+  select("MasVnrArea", "TotalBsmtSF") %>% 
+  correlate() %>% 
+  rearrange() %>%  
+   shave() 
+```
+
+La corrélation la plus élevée que nous trouvons est avec la variable TotalBsmtSF. Toutefois, le résultat est de 0,39, la corrélation est donc faible et nous ne pouvons pas nous baser sur cette variable pour remplir les valeurs manquantes.
+
+--------------------------------------------------------------------------------
+
+```{r}
+full.df$MasVnrType[is.na(full.df$MasVnrType)] = "None"
+full.df$MasVnrArea[is.na(full.df$MasVnrArea)] = 0
+```
+
+En revanche, étant donné qu'il y a 24 valeurs manquantes pour le type de matériau et seulement 23 pour la surface couverte çela veut dire qu'il y a eu une erreur de saisie ou un oubli pour le matériau d'une habitation (car la surface est bien présente). 
+Vérifions quels sont les matériaux les plus utilisées pour le placage.
+
+```{r}
+Graph3 <- ggplot(full.df) +
+ aes(x = MasVnrType) +
+ geom_bar(fill = "#0c4c8a") +
+ theme_minimal()
+ggplotly(Graph3)
+```
+
+Ce graphique nous montre qu'au total il y a 1153 (879 + 25 + 249) habitations qui ont un placage. Le matériau le plus utilisé est clairement la brique qui représente 76% (879/1153) des placages. On peut donc affirmer avec une certitude de 76% que la valeur manquante est BrkFace, ce qui est un risque acceptable.
+
+```{r}
+full.df[2611, 26] = "BrkFace"
+```
+
+```{r}
+Graph10 <- gg_miss_var(full.df)
+ggplotly(Graph10)
+```
