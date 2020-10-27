@@ -254,6 +254,14 @@ full.df %>%
 
 La corrélation la plus élevée que nous trouvons est avec la variable TotalBsmtSF. Toutefois, le résultat est de 0,39, la corrélation est donc faible et nous ne pouvons pas nous baser sur cette variable pour remplir les valeurs manquantes.
 
+Nous allons donc regarder les moyennes pour  les valeurs manquantes de la variable MasVnrArea indiquant BrkFace ou Stone pour la variable MasVnrType.
+
+```{r}
+full.df %>% filter(MasVnrType=="BrkFace") %>% mean(full.df$MasVnrArea) # faire test en créant jeu de données <- test
+mean(full.df$MasVnrArea[full.df$MasVnrType=="BrkFace"], na.rm = TRUE) # voir si le résultat est bon
+```
+
+
 --------------------------------------------------------------------------------
 
 ```{r}
