@@ -19,7 +19,7 @@ library(data.table) # to ?????????
 library(corrr) # pour les corrélations entre variables
 ```
 
-# Download the data
+# Chargement du jeu de données
 
 ```{r}
 train.df <- read_csv("trainhouseprices.csv")
@@ -61,7 +61,7 @@ Nous regardons les dix premières lignes de notre jeu de données, nous pouvons 
 
 # Gérer les valeurs manquantes
 
-## NA sur la globalité du jeu de données
+### NA sur la globalité du jeu de données
 
 ```{r}
 na_count <-sapply(full.df, function(y) sum(length(which(is.na(y)))))
@@ -105,7 +105,9 @@ full.df$FireplaceQu[is.na(full.df$FireplaceQu)] = "No"
 
 Les valeurs indiquées comme NA pour les précédentes variables ont donc été remplacées par la valeur "No", cela permettra de passer ces variables en facteur au moment voulu.
 
-### Vérification pour la variable PoolQC
+## Remplacement des NA sur les autres variables
+
+### Variable PoolQC
 
 ```{r}
 full.df[full.df$PoolArea>0 & full.df$PoolQC=="No", c("Id", 'PoolArea', 'PoolQC', 'OverallQual')]
@@ -122,7 +124,7 @@ full.df$PoolQC[2600] <- "Fa"
 
 Les valeurs ont été remplacées en prenant en compte la qualité globale de l'habitation.
 
-### Vérification pour la variable FirePlaceQu
+### Variable FirePlaceQu
 
 ```{r}
 full.df[full.df$Fireplaces>0 & full.df$FireplaceQu=="No", c("Id", 'Fireplaces', 'FireplaceQu')]
@@ -130,7 +132,7 @@ full.df[full.df$Fireplaces>0 & full.df$FireplaceQu=="No", c("Id", 'Fireplaces', 
 
 Il n'y a aucune erreur sur la variable FirePlaceQu, car lorsque la valeur indique "No", il y a effectivement aucune cheminée au sein de l'habitation.
 
-### Valeurs manquantes Lot Frontage
+### Variable LotFrontage
 
 ```{r}
 summary(full.df$LotFrontage)
@@ -164,7 +166,7 @@ full.df[,LotFrontage := ifelse(is.na(LotFrontage), median(LotFrontage, na.rm=TRU
 full.df <- full.df[order(full.df$Id),]
 ```
 
-Regarder maintenant pour les valeurs manquantes concernant les garages
+### Variables relatives au Garage
 
 Pour GarageType, la valeur NA indique l'absence de garage. Il faut donc regarder pour les autres variables garages si l'absence d'informations provient de l'absence d'un garage.
 
@@ -219,9 +221,7 @@ full.df$GarageCars[is.na(full.df$GarageCars)] = "Abs"
 full.df$GarageArea[is.na(full.df$GarageArea)] = "Abs"
 ```
 
-Il va maintenant falloir passer aux variables Bsmt (sous-sol)
-
-### Valeurs manquantes MasVnrArea/MasVnrType
+### Variables MasVnrArea/MasVnrType
 
 ```{r}
 summary(full.df$MasVnrArea)
@@ -231,10 +231,10 @@ La moyenne de la variable MasVnrArea (qui indique la surface de placage sur les 
 
 ```{r}
 full.df$MasVnrArea <- as.numeric(full.df$MasVnrArea)
-table(full.df$MasVnrArea==0, full.df$MasVnrType) # à envoyer à Vic
+table(full.df$MasVnrArea==0, full.df$MasVnrType) 
 ```
 
-Après avoir filtré la base de données pour ne garder que les habitations qui ont une valeur MasVnrArea égale à zéro, on remarque qu'il y a une corrélation entre les variables MasVnrArea et MasVnrType (qui indique le type de placage) : pour toutes les habitations qui ont une valeur MasVnrArea nulle, la variable MasVnrType indique "None". Donc il ne s'aggit pas d'une erreur puisque les valeurs nulles correspondent aux habitations dont les façades ne possèdent pas de placage). Néanmoins, il y a 3 valeurs pour lesquelles MasVnrArea indique 0 alors que MasVnrType indique BrkFace ou Stone. Nous allons donc chercher ces 3 valeurs dans un premier temps.
+Après avoir filtré la base de données pour ne garder que les habitations qui ont une valeur MasVnrArea égale à zéro, on remarque qu'il y a une corrélation entre les variables MasVnrArea et MasVnrType (qui indique le type de placage) : pour toutes les habitations qui ont une valeur MasVnrArea nulle, la variable MasVnrType indique "None". Donc il ne s'agit pas d'une erreur puisque les valeurs nulles correspondent aux habitations dont les façades ne possèdent pas de placage). Néanmoins, il y a 3 valeurs pour lesquelles MasVnrArea indique 0 alors que MasVnrType indique BrkFace ou Stone. Nous allons donc chercher ces 3 valeurs dans un premier temps. Il existe également 7 habitations ne possédant pas une valeur nulle pour MasVnrArea alors que le MasVnrType est None.
  
 ```{r}
 which(full.df$MasVnrArea==0 & full.df$MasVnrType=="BrkFace", arr.ind=TRUE)
@@ -257,10 +257,83 @@ La corrélation la plus élevée que nous trouvons est avec la variable TotalBsm
 Nous allons donc regarder les moyennes pour  les valeurs manquantes de la variable MasVnrArea indiquant BrkFace ou Stone pour la variable MasVnrType.
 
 ```{r}
-full.df %>% filter(MasVnrType=="BrkFace") %>% mean(full.df$MasVnrArea) # faire test en créant jeu de données <- test
-mean(full.df$MasVnrArea[full.df$MasVnrType=="BrkFace"], na.rm = TRUE) # voir si le résultat est bon
+BrkNum <- mean(full.df$MasVnrArea[full.df$MasVnrType=="BrkFace"], na.rm = TRUE) 
+StoneNum <- mean(full.df$MasVnrArea[full.df$MasVnrType=="Stone"], na.rm = TRUE)
 ```
 
+Nous pouvons voir que la moyenne MasVnrArea pour MasVnrType = BrkFace est de 261.67. Elle est de 239.55 pour MasVnrType = Stone.
+Nous allons donc utiliser ces deux valeurs pour remplacer les valeurs NA de la variable MasVnrArea.
+
+```{r}
+full.df$MasVnrArea[689] <- BrkNum
+full.df$MasVnrArea[2320] <- BrkNum
+full.df$MasVnrArea[1242] <- StoneNum
+```
+
+Nous allons maintenant nous intéresser aux valeurs none de la variable MasVnrType lorsque MasVnrArea est supérieure à 0. Nous devrions retrouver 7 valeurs.
+
+```{r}
+which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
+```
+
+```{r}
+full.df$MasVnrArea[625] # tester pour chaque ligne
+```
+
+Voici les valeurs trouvées pour les différentes lignes :
+Ligne 625 -> 288
+Ligne 774 -> 1
+Ligne 1231 -> 1
+Ligne 1301 -> 344
+Ligne 1335 -> 312
+Ligne 1670 -> 285
+Ligne 2453 -> 1
+
+Nous allons vérifier pour les lignes affichant la valeur 1 s'il ne s'agit pas d'une erreur.
+
+```{r}
+which(full.df$MasVnrArea==1, arr.ind=TRUE)
+```
+
+Nous remarquons en effectuant une recherche sur le jeu de données complet qu'il s'agit des mêmes lignes. Nous pouvons donc conclure à une erreur et remplacer ces valeurs 1 par la valeur 0.
+
+```{r}
+full.df$MasVnrArea[774] <- 0
+full.df$MasVnrArea[1231] <- 0
+full.df$MasVnrArea[2453] <- 0
+```
+
+Pour les 4 lignes affichant des valeurs supérieures à 1, nous allons vérifier s'il existe une corrélation entre le lieu d'habitation et le type de façade.
+
+```{r}
+table(full.df$MasVnrType, full.df$Neighborhood)
+```
+
+Nous remarquons que la majorité des villes ont une majorité de maison avec une façade de type BrkFace ou alors None. Nous allons toutefois vérifier les 4 lignes pour vérifier dans quelles villes se trouvent ces 4 habitations.
+
+```{r}
+full.df$Neighborhood[625]
+full.df$Neighborhood[1301]
+full.df$Neighborhood[1335]
+full.df$Neighborhood[1670]
+```
+
+Pour effectuer les remplacements de valeurs, nous choisirons le type de façade le plus présent dans la ville en question (autre que None).
+
+```{r}
+full.df$MasVnrType[625] <- "BrkFace"
+full.df$MasVnrType[1301] <- "BrkFace"
+full.df$MasVnrType[1335] <- "BrkFace"
+full.df$MasVnrType[1670] <- "Stone"
+```
+
+Nous allons revérifier s'il existe des valeurs manquantes ou incohérentes.
+
+```{r}
+table(full.df$MasVnrArea==0, full.df$MasVnrType) 
+```
+
+Nous allons maintenant nous occuper des valeurs NA pour MasVnrArea et MasVnrType.
 
 --------------------------------------------------------------------------------
 
@@ -290,3 +363,5 @@ full.df[2611, 26] = "BrkFace"
 Graph10 <- gg_miss_var(full.df)
 ggplotly(Graph10)
 ```
+
+Il va maintenant falloir passer aux variables Bsmt (sous-sol)
