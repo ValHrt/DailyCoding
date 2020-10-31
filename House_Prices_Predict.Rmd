@@ -166,7 +166,7 @@ full.df[,LotFrontage := ifelse(is.na(LotFrontage), median(LotFrontage, na.rm=TRU
 full.df <- full.df[order(full.df$Id),]
 ```
 
-### Variables relatives au Garage
+### Variables Garage
 
 Pour GarageType, la valeur NA indique l'absence de garage. Il faut donc regarder pour les autres variables garages si l'absence d'informations provient de l'absence d'un garage.
 
@@ -327,41 +327,33 @@ full.df$MasVnrType[1335] <- "BrkFace"
 full.df$MasVnrType[1670] <- "Stone"
 ```
 
-Nous allons revérifier s'il existe des valeurs manquantes ou incohérentes.
+Nous allons revérifier s'il existe des valeurs incohérentes.
+Puis nous nous occuperons des valeurs NA pour MasVnrArea et MasVnrType.
 
 ```{r}
-table(full.df$MasVnrArea==0, full.df$MasVnrType) 
+table(full.df$MasVnrArea==0, full.df$MasVnrType, useNA = "always")
 ```
 
-Nous allons maintenant nous occuper des valeurs NA pour MasVnrArea et MasVnrType.
-
---------------------------------------------------------------------------------
+Nous remarquons qu'il n'existe plus de valeurs incohérentes.
+En ce qui concerne les valeurs NA de ces deux variables, nous remarquons qu'il y a une coincidence pour 23 d'entre elles. Pour ces 23 valeurs, nous remplacerons les valeurs manquantes par None et 0. Nous allons ensuite voir la valeur affichant NA pour MasVnrType mais une valeur numérique supérieure à 0 pour MasVnrArea.
 
 ```{r}
 full.df$MasVnrType[is.na(full.df$MasVnrType)] = "None"
+which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
+```
+
+Nous remarquons qu'il s'agit de la ligne 2611 qui présente un problème. Nous allons procéder de la même manière que précédemment, regarder la ville dans laquelle se trouve l'habitation et remplacer MasVnrType par la valeur la plus commune.
+
+```{r}
+full.df$Neighborhood[2611]
+```
+
+Pour la commune de Mitchel, c'est le BrkFace qui arrive en tête. Nous allons donc modifier cette valeur.
+
+```{r}
+full.df$MasVnrType[2611] <- "BrkFace"
 full.df$MasVnrArea[is.na(full.df$MasVnrArea)] = 0
 ```
 
-En revanche, étant donné qu'il y a 24 valeurs manquantes pour le type de matériau et seulement 23 pour la surface couverte çela veut dire qu'il y a eu une erreur de saisie ou un oubli pour le matériau d'une habitation (car la surface est bien présente). 
-Vérifions quels sont les matériaux les plus utilisées pour le placage.
+### Variables Bsmt
 
-```{r}
-Graph3 <- ggplot(full.df) +
- aes(x = MasVnrType) +
- geom_bar(fill = "#0c4c8a") +
- theme_minimal()
-ggplotly(Graph3)
-```
-
-Ce graphique nous montre qu'au total il y a 1153 (879 + 25 + 249) habitations qui ont un placage. Le matériau le plus utilisé est clairement la brique qui représente 76% (879/1153) des placages. On peut donc affirmer avec une certitude de 76% que la valeur manquante est BrkFace, ce qui est un risque acceptable.
-
-```{r}
-full.df[2611, 26] = "BrkFace"
-```
-
-```{r}
-Graph10 <- gg_miss_var(full.df)
-ggplotly(Graph10)
-```
-
-Il va maintenant falloir passer aux variables Bsmt (sous-sol)
