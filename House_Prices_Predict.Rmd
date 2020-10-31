@@ -357,3 +357,60 @@ full.df$MasVnrArea[is.na(full.df$MasVnrArea)] = 0
 
 ### Variables Bsmt
 
+Pour BsmtQual, BsmtCond, BsmtExposure, BsmtFinType1 et BsmtFinType2, la valeur NA indique l'absence de sous-sol.
+Pour les autres variables Bsmt, un NA indique une valeur manquante (nous remarquons qu'il manque uniquement une valeur pour ces dernieres).
+
+BsmtQual 81
+
+BsmtCond 82
+
+BsmtExposure 82
+
+BsmtFinType1 79
+
+BsmtFinType2	80
+
+BsmtFinSF1	1
+
+BsmtFinSF2	1
+
+BsmtUnfSF 1
+
+TotalBsmtSF	1
+
+Nous allons donc utiliser les 3 premières variables ci-dessus pour vérifier s'il existe des incohérences (c'est à dire une valeur NA pour une variable alors qu'une autre affiche une valeur).
+
+```{r}
+table(full.df$BsmtQual, full.df$BsmtExposure, full.df$BsmtCond, useNA = "always")
+```
+
+Nous dénombrons 8 erreurs entre ces 3 variables. 
++ BsmtQual affiche NA alors que BsmtExposure affiche No et BsmtCond affiche Fa
++ BsmtQual affiche NA alors que BsmtExposure affiche No et BsmtCond affiche TA
++ BsmtExposure affiche NA alors que BsmtQual affiche Gd et BsmtCond affiche TA (3 occurences)
++ BsmtCond affiche NA alors que BsmtQual affiche TA et BsmtExposure affiche Av
++ BsmtCond affiche NA alors que BsmtQual affiche Gd et BsmtExposure affiche Mn
++ BsmtCond affiche NA alors que BsmtQual affiche TA et BsmtExposure affiche No
+
+Nous pouvons constater qu'il s'agit bel et bien d'une erreur pour ces valeurs car dans chaque cas, deux variables Bsmt indiquent la présence d'un sous-sol et seulement une variable indique son absence.
+
+Nous allons donc regarder ces valeurs une à une pour tenter de les prédire.
+
+Pour que la recherche soit plus simple, nous modifions le nom des valeurs NA de ces 3 variables en Abs (que nous remodifierons par la suite pour les 8 valeurs qui posent problème).
+
+```{r}
+full.df$BsmtQual[is.na(full.df$BsmtQual)] = "Abs"
+full.df$BsmtCond[is.na(full.df$BsmtCond)] = "Abs"
+full.df$BsmtExposure[is.na(full.df$BsmtExposure)] = "Abs"
+```
+
+```{r}
+which(full.df$BsmtQual=="Abs" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="Fa", arr.ind=TRUE)
+which(full.df$BsmtQual=="Abs" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="TA", arr.ind=TRUE)
+which(full.df$BsmtQual=="Gd" & full.df$BsmtExposure=="Abs" & full.df$BsmtCond=="TA", arr.ind=TRUE)
+which(full.df$BsmtQual=="TA" & full.df$BsmtExposure=="Av" & full.df$BsmtCond=="Abs", arr.ind=TRUE)
+which(full.df$BsmtQual=="Gd" & full.df$BsmtExposure=="Mn" & full.df$BsmtCond=="Abs", arr.ind=TRUE)
+which(full.df$BsmtQual=="TA" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="Abs", arr.ind=TRUE)
+```
+
+Nous devons maintenant trouver une méthode pour remplacer les valeurs 8 valeurs Abs de ces 3 variables.
