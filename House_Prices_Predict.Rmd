@@ -17,6 +17,7 @@ library(caret) # to perform RF model
 library(naniar) # to visualize missing data
 library(data.table) # to ?????????
 library(corrr) # pour les corrélations entre variables
+library(naniar) # trouver l'emplacement des NA
 ```
 
 # Chargement du jeu de données
@@ -477,3 +478,77 @@ table(full.df$BsmtFinType1, full.df$BsmtFinType2, full.df$BsmtQual, useNA = "alw
 
 On ne dénombre qu'une seule incohérence pour ces deux variables. Il s'agit de l'erreur suivante :
 BsmtFinType1 affiche GLQ, BsmtQual affiche Gd et BsmtFinType2 affiche NA.
+
+```{r}
+full.df$BsmtFinType1[is.na(full.df$BsmtFinType1)] = "Abs"
+full.df$BsmtFinType2[is.na(full.df$BsmtFinType2)] = "Abs"
+
+which(full.df$BsmtFinType1=="GLQ" & full.df$BsmtQual=="Gd" & full.df$BsmtFinType2=="Abs", arr.ind = TRUE)
+```
+
+Nous devons maintenant trouver une manière de remplacer cette valeur manquante. Pour cela, nous allons voir s'il existe une corrélation entre les variables BsmtFinType1 et BsmtFinType2.
+
+```{r}
+table(full.df$BsmtFinType1, full.df$BsmtFinType2)
+```
+
+Pour BsmtFinType2, la valeur qui prédomine est Unf, nous allons donc remplacer la valeur manquante par celle ci.
+
+```{r}
+full.df$BsmtFinType2[333] <- "Unf"
+```
+
+### Variables BsmtFinSF1 et BsmtFinSF2
+
+```{r}
+which_na(full.df$BsmtFinSF1)
+which_na(full.df$BsmtFinSF2)
+```
+
+Nous remarquons que les deux valeurs manquantes se trouvent sur la même ligne.
+
+```{r}
+#full.df[2121]
+```
+
+Nous remarquons ici que non seulement il manque les valeurs pour les variables BsmtFinSF1 et BsmtFinSF2 mais également pour BsmtUnfSF, TotalBsmtSF, BsmtFullBath et BsmtHalfBath.
+Nous allons donc pouvoir modifier toutes ces valeurs par la valeur 0.
+
+```{r}
+full.df$BsmtFinSF1[2121] <- 0
+full.df$BsmtFinSF2[2121] <- 0
+full.df$BsmtUnfSF[2121] <- 0
+full.df$TotalBsmtSF[2121] <- 0
+full.df$BsmtFullBath[2121] <- 0
+full.df$BsmtHalfBath[2121] <- 0
+```
+
+Pour effectuer une dernière vérification sur ces variables et voir si nous n'avons pas introduit d'erreurs, nous allons faire un test avec la fonction which.
+
+```{r}
+which(full.df$BsmtQual=="Abs" & full.df$TotalBsmtSF>0, arr.ind = TRUE)
+```
+
+La valeur renvoyée est 0. Cela veut dire qu'aucune erreur n'a été introduite.
+
+### Variables BsmtFullBath et BsmtHalfBath
+
+```{r}
+which_na(full.df$BsmtFullBath)
+which_na(full.df$BsmtHalfBath)
+```
+
+Les 2 valeurs manquantes se trouvent sur la ligne 2189.
+
+```{r}
+#full.df[2189]
+```
+
+Nous remarquons que les autres variables relatives à Bsmt indiquent l'absence de sous-sol. Nous pouvons donc remplacer les valeurs de ces deux variables par 0.
+
+```{r}
+full.df$BsmtFullBath[is.na(full.df$BsmtFullBath)] = 0
+full.df$BsmtHalfBath[is.na(full.df$BsmtHalfBath)] = 0
+```
+
+Nous avons maintenant terminé avec l'ensemble des variables Bsmt.
