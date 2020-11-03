@@ -55,7 +55,7 @@ full.df <- rbind(train.df, test.df)
 We merge the two datasets to perform analysis on the full data.
 
 ```{r}
-head(full.df, 10)
+#head(full.df, 10)
 ```
 
 Nous regardons les dix premières lignes de notre jeu de données, nous pouvons constater que certaines variables comportent des valeurs manquantes. Nous allons donc étudier quelles sont les valeurs manquantes puis essayer de définir une méthode pour les prédire.
@@ -71,13 +71,13 @@ na_count <- data.frame(na_count)
 
 na_count <- rownames_to_column(na_count)
 na_count <- filter(na_count, na_count > 0)
-na_count
+#na_count
 ```
 
 Nous pouvons voir que les variables qui comptent le plus de valeurs manquantes sont Alley, PoolQc, MiscFeature, Fence, FirePlaceQu. Il y a 29 variables qui contiennent des valeurs nulles mais dans une moindre mesure. Il sera donc plus simple de les prédire. Enfin, la variable SalePrice contient 1459 valeurs manquantes soit le nombre de lignes du jeu de données test.
 
 ```{r}
-gg_miss_var(full.df)
+#gg_miss_var(full.df)
 ```
 
 Une autre manière de visualiser les valeurs manquantes de façon hiérarchique. Sur ce graphique, nous distinguons clairement 6 variables pour lesquelles nous avons plus de 1000 valeurs nulles.
@@ -111,7 +111,7 @@ Les valeurs indiquées comme NA pour les précédentes variables ont donc été 
 ### Variable PoolQC
 
 ```{r}
-full.df[full.df$PoolArea>0 & full.df$PoolQC=="No", c("Id", 'PoolArea', 'PoolQC', 'OverallQual')]
+#full.df[full.df$PoolArea>0 & full.df$PoolQC=="No", c("Id", 'PoolArea', 'PoolQC', 'OverallQual')]
 ```
 
 Nous constatons qu'il y a 3 valeurs "No" pour la variable PoolQC alors que la variable PoolArea indique une taille de piscine (donc la présence d'une piscine sur la propriété). Il s'agit donc d'une erreur de saisie ou d'une omission pour la variable PoolQC sur les lignes.
@@ -128,7 +128,7 @@ Les valeurs ont été remplacées en prenant en compte la qualité globale de l'
 ### Variable FirePlaceQu
 
 ```{r}
-full.df[full.df$Fireplaces>0 & full.df$FireplaceQu=="No", c("Id", 'Fireplaces', 'FireplaceQu')]
+#full.df[full.df$Fireplaces>0 & full.df$FireplaceQu=="No", c("Id", 'Fireplaces', 'FireplaceQu')]
 ```
 
 Il n'y a aucune erreur sur la variable FirePlaceQu, car lorsque la valeur indique "No", il y a effectivement aucune cheminée au sein de l'habitation.
@@ -136,13 +136,13 @@ Il n'y a aucune erreur sur la variable FirePlaceQu, car lorsque la valeur indiqu
 ### Variable LotFrontage
 
 ```{r}
-summary(full.df$LotFrontage)
+#summary(full.df$LotFrontage)
 ```
 
 Cette première analyse nous permet de constater que pour la variable LotFrontage, la valeur minimum est 21. Nous ne pouvons donc pas conclure que les valeurs NA représentent la valeur 0. 
 
 ```{r}
-table(is.na(full.df$LotFrontage), full.df$MSZoning)
+#table(is.na(full.df$LotFrontage), full.df$MSZoning)
 ```
 
 Dans un premier temps, nous essayons de voir s'il existe un lien entre la variable MsZoning et la variable LotFrontage. Nous décidons de faire cette analyse car il pourrait y avoir un lien par exemple entre le fait d'être en zone agricole et ainsi ne pas avoir de surface du lot bordant la rue. 
@@ -152,9 +152,9 @@ Nous constatons que les valeurs manquantes pour LotFrontage semblent être distr
 En étudiant les autres variables du jeu de données, nous nous apercevons qu'aucune autre ne semble pouvoir expliquer les absences de valeurs pour la variable LotFrontage. Nous allons donc devoir trouver une méthode pour prédire les valeurs de cette dernière.
 
 ```{r}
-ggplot(full.df[!is.na(full.df$LotFrontage),], aes(x=as.factor(Neighborhood), y=LotFrontage)) +
-        geom_bar(stat='summary', fun.y = "median", fill='red') +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#ggplot(full.df[!is.na(full.df$LotFrontage),], aes(x=as.factor(Neighborhood), y=LotFrontage)) +
+        #geom_bar(stat='summary', fun.y = "median", fill='red') +
+        #theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Nous voyons que les valeurs pour LotFrontage divergent en fonction du lieu. Nous allons donc affecter les valeurs médianes aux valeurs manquantes pour cette variable.
@@ -190,7 +190,7 @@ full.df$GarageType[is.na(full.df$GarageType)] = "Abs"
 Ensuite nous créons un jeu de données avec l'ensemble des variables Garage (voir si c'est pertinent)
 
 ```{r}
-full.df[full.df$GarageType=="Abs", c("GarageYrBlt", 'GarageQual', 'GarageCond', 'GarageFinish')]
+#full.df[full.df$GarageType=="Abs", c("GarageYrBlt", 'GarageQual', 'GarageCond', 'GarageFinish')]
 ```
 Nous pouvons voir que parmi toutes les valeurs Abs pour la variable GarageType, les variables GarageYrBlt, GarageQual, GarageCond et GarageFinish affichent une valeur "NA". Ainsi, nous allons pouvoir remplacer ces NA par la valeur Abs.
 
@@ -204,14 +204,14 @@ full.df$GarageFinish[is.na(full.df$GarageFinish)] = "Abs"
 Les variables GarageCars et GarageArea comptent chacune une valeur NA, nous allons vérifier si cette valeur NA correspond à l'absence de garage ou s'il s'agit d'une erreur de saisie lors de la création du jeu de données.
 
 ```{r}
-which(is.na(full.df$GarageCars), arr.ind=TRUE)
-which(is.na(full.df$GarageArea), arr.ind=TRUE)
+#which(is.na(full.df$GarageCars), arr.ind=TRUE)
+#which(is.na(full.df$GarageArea), arr.ind=TRUE)
 ```
 
 Nous pouvons voir que les 2 valeurs manquantes pour les 2 variables se trouvent sur la même ligne, la ligne 2577.
 
 ```{r}
-full.df[2577]
+#full.df[2577]
 ```
 
 Sur la ligne 2577, toutes les variables relatives au Garage indiquent l'absence d'un garage excepté pour la variable GarageType qui indique "Detchd", nous pouvons donc conclure qu'il s'agit d'une erreur de saisie et que cette valeur devrait être "Abs" au lieu de "Detchd".
@@ -225,14 +225,14 @@ full.df$GarageArea[is.na(full.df$GarageArea)] = "Abs"
 ### Variables MasVnrArea/MasVnrType
 
 ```{r}
-summary(full.df$MasVnrArea)
+#summary(full.df$MasVnrArea)
 ```
 
 La moyenne de la variable MasVnrArea (qui indique la surface de placage sur les façades) est de 102.2m² alors que la médiane est de 0, donc au moins la moitié des valeurs pour cette variable sont nulles, vérifions s'il s'agit d'une erreur.
 
 ```{r}
 full.df$MasVnrArea <- as.numeric(full.df$MasVnrArea)
-table(full.df$MasVnrArea==0, full.df$MasVnrType) 
+#table(full.df$MasVnrArea==0, full.df$MasVnrType) 
 ```
 
 Après avoir filtré la base de données pour ne garder que les habitations qui ont une valeur MasVnrArea égale à zéro, on remarque qu'il y a une corrélation entre les variables MasVnrArea et MasVnrType (qui indique le type de placage) : pour toutes les habitations qui ont une valeur MasVnrArea nulle, la variable MasVnrType indique "None". Donc il ne s'agit pas d'une erreur puisque les valeurs nulles correspondent aux habitations dont les façades ne possèdent pas de placage). Néanmoins, il y a 3 valeurs pour lesquelles MasVnrArea indique 0 alors que MasVnrType indique BrkFace ou Stone. Nous allons donc chercher ces 3 valeurs dans un premier temps. Il existe également 7 habitations ne possédant pas une valeur nulle pour MasVnrArea alors que le MasVnrType est None.
@@ -274,11 +274,11 @@ full.df$MasVnrArea[1242] <- StoneNum
 Nous allons maintenant nous intéresser aux valeurs none de la variable MasVnrType lorsque MasVnrArea est supérieure à 0. Nous devrions retrouver 7 valeurs.
 
 ```{r}
-which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
+#which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
 ```
 
 ```{r}
-full.df$MasVnrArea[625] # tester pour chaque ligne
+#full.df$MasVnrArea[625] # tester pour chaque ligne
 ```
 
 Voici les valeurs trouvées pour les différentes lignes :
@@ -293,7 +293,7 @@ Ligne 2453 -> 1
 Nous allons vérifier pour les lignes affichant la valeur 1 s'il ne s'agit pas d'une erreur.
 
 ```{r}
-which(full.df$MasVnrArea==1, arr.ind=TRUE)
+#which(full.df$MasVnrArea==1, arr.ind=TRUE)
 ```
 
 Nous remarquons en effectuant une recherche sur le jeu de données complet qu'il s'agit des mêmes lignes. Nous pouvons donc conclure à une erreur et remplacer ces valeurs 1 par la valeur 0.
@@ -307,16 +307,16 @@ full.df$MasVnrArea[2453] <- 0
 Pour les 4 lignes affichant des valeurs supérieures à 1, nous allons vérifier s'il existe une corrélation entre le lieu d'habitation et le type de façade.
 
 ```{r}
-table(full.df$MasVnrType, full.df$Neighborhood)
+#table(full.df$MasVnrType, full.df$Neighborhood)
 ```
 
 Nous remarquons que la majorité des villes ont une majorité de maison avec une façade de type BrkFace ou alors None. Nous allons toutefois vérifier les 4 lignes pour vérifier dans quelles villes se trouvent ces 4 habitations.
 
 ```{r}
-full.df$Neighborhood[625]
-full.df$Neighborhood[1301]
-full.df$Neighborhood[1335]
-full.df$Neighborhood[1670]
+#full.df$Neighborhood[625]
+#full.df$Neighborhood[1301]
+#full.df$Neighborhood[1335]
+#full.df$Neighborhood[1670]
 ```
 
 Pour effectuer les remplacements de valeurs, nous choisirons le type de façade le plus présent dans la ville en question (autre que None).
@@ -332,7 +332,7 @@ Nous allons revérifier s'il existe des valeurs incohérentes.
 Puis nous nous occuperons des valeurs NA pour MasVnrArea et MasVnrType.
 
 ```{r}
-table(full.df$MasVnrArea==0, full.df$MasVnrType, useNA = "always")
+#table(full.df$MasVnrArea==0, full.df$MasVnrType, useNA = "always")
 ```
 
 Nous remarquons qu'il n'existe plus de valeurs incohérentes.
@@ -340,13 +340,13 @@ En ce qui concerne les valeurs NA de ces deux variables, nous remarquons qu'il y
 
 ```{r}
 full.df$MasVnrType[is.na(full.df$MasVnrType)] = "None"
-which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
+#which(full.df$MasVnrArea>0 & full.df$MasVnrType=="None", arr.ind=TRUE)
 ```
 
 Nous remarquons qu'il s'agit de la ligne 2611 qui présente un problème. Nous allons procéder de la même manière que précédemment, regarder la ville dans laquelle se trouve l'habitation et remplacer MasVnrType par la valeur la plus commune.
 
 ```{r}
-full.df$Neighborhood[2611]
+#full.df$Neighborhood[2611]
 ```
 
 Pour la commune de Mitchel, c'est le BrkFace qui arrive en tête. Nous allons donc modifier cette valeur.
@@ -382,7 +382,7 @@ TotalBsmtSF	1
 Nous allons donc utiliser les 3 premières variables ci-dessus pour vérifier s'il existe des incohérences (c'est à dire une valeur NA pour une variable alors qu'une autre affiche une valeur).
 
 ```{r}
-table(full.df$BsmtQual, full.df$BsmtExposure, full.df$BsmtCond, useNA = "always")
+#table(full.df$BsmtQual, full.df$BsmtExposure, full.df$BsmtCond, useNA = "always")
 ```
 
 Nous dénombrons 8 erreurs entre ces 3 variables. 
@@ -405,8 +405,8 @@ full.df$BsmtCond[is.na(full.df$BsmtCond)] = "Abs"
 full.df$BsmtExposure[is.na(full.df$BsmtExposure)] = "Abs"
 ```
 
-```{r}
-which(full.df$BsmtQual=="Abs" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="Fa", arr.ind=TRUE)
+```{r eval=FALSE, include=FALSE}
+which(full.df$BsmtQual=="Abs" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="Fa", arr.ind=TRUE) # code chunk bloque pour ne pas le lire
 which(full.df$BsmtQual=="Abs" & full.df$BsmtExposure=="No" & full.df$BsmtCond=="TA", arr.ind=TRUE)
 which(full.df$BsmtQual=="Gd" & full.df$BsmtExposure=="Abs" & full.df$BsmtCond=="TA", arr.ind=TRUE)
 which(full.df$BsmtQual=="TA" & full.df$BsmtExposure=="Av" & full.df$BsmtCond=="Abs", arr.ind=TRUE)
@@ -419,7 +419,7 @@ Nous devons maintenant trouver une méthode pour remplacer les 8 valeurs Abs de 
 Nous regardons dans un premier temps le lien entre les variables BsmtQual et OverallQual.
 
 ```{r}
-table(full.df$BsmtQual, full.df$OverallQual)
+#table(full.df$BsmtQual, full.df$OverallQual)
 ```
 
 Nous remarquons qu'il existe une corrélation entre les deux variables :
@@ -431,8 +431,8 @@ Lorsque Bsmt Qual affiche Fa, OverallQual prend les valeurs 1 ou 2
 Nous allons donc remplacer les valeurs absentes en fonction des valeurs affichées par la variable OverallQUal.
 
 ```{r}
-full.df$OverallQual[2218]
-full.df$OverallQual[2219]
+#full.df$OverallQual[2218]
+#full.df$OverallQual[2219]
 ```
 
 Pour les deux valeurs indiquant Abs pour la variable BsmtQual sur les lignes 2218 et 2219, nous remplaçons donc par la valeur TA.
@@ -445,7 +445,7 @@ full.df$BsmtQual[2219] <- "TA"
 Même manip pour la variable BsmtCond 
 
 ```{r}
-table(full.df$BsmtCond, full.df$OverallQual)
+#table(full.df$BsmtCond, full.df$OverallQual)
 ```
 
 Ici, nous remarquons que la valeur TA pour la variable BsmtCond prédomine. Ainsi, nous allons remplacer les valeurs manquantes par la valeur TA.
@@ -459,7 +459,7 @@ full.df$BsmtCond[2186] <- "TA"
 Même manip pour la variable BsmtExposure en comparaison à la variable Neighborhood (car souvent les habitations ont la même typologie au sein d'un même quartier).
 
 ```{r}
-table(full.df$BsmtExposure, full.df$Neighborhood)
+#table(full.df$BsmtExposure, full.df$Neighborhood)
 ```
 
 Ici, nous voyons encore que la valeur No prédomine dans la variable BsmtExposure. Nous allons donc remplacer les valeurs manquantes par Abs.
@@ -473,7 +473,7 @@ full.df$BsmtExposure[2349] <- "No"
 ### Variables BsmtFinType1 et BsmtFinType2
 
 ```{r}
-table(full.df$BsmtFinType1, full.df$BsmtFinType2, full.df$BsmtQual, useNA = "always")
+#table(full.df$BsmtFinType1, full.df$BsmtFinType2, full.df$BsmtQual, useNA = "always")
 ```
 
 On ne dénombre qu'une seule incohérence pour ces deux variables. Il s'agit de l'erreur suivante :
@@ -483,13 +483,13 @@ BsmtFinType1 affiche GLQ, BsmtQual affiche Gd et BsmtFinType2 affiche NA.
 full.df$BsmtFinType1[is.na(full.df$BsmtFinType1)] = "Abs"
 full.df$BsmtFinType2[is.na(full.df$BsmtFinType2)] = "Abs"
 
-which(full.df$BsmtFinType1=="GLQ" & full.df$BsmtQual=="Gd" & full.df$BsmtFinType2=="Abs", arr.ind = TRUE)
+#which(full.df$BsmtFinType1=="GLQ" & full.df$BsmtQual=="Gd" & full.df$BsmtFinType2=="Abs", arr.ind = TRUE)
 ```
 
 Nous devons maintenant trouver une manière de remplacer cette valeur manquante. Pour cela, nous allons voir s'il existe une corrélation entre les variables BsmtFinType1 et BsmtFinType2.
 
 ```{r}
-table(full.df$BsmtFinType1, full.df$BsmtFinType2)
+#table(full.df$BsmtFinType1, full.df$BsmtFinType2)
 ```
 
 Pour BsmtFinType2, la valeur qui prédomine est Unf, nous allons donc remplacer la valeur manquante par celle ci.
@@ -501,8 +501,8 @@ full.df$BsmtFinType2[333] <- "Unf"
 ### Variables BsmtFinSF1 et BsmtFinSF2
 
 ```{r}
-which_na(full.df$BsmtFinSF1)
-which_na(full.df$BsmtFinSF2)
+#which_na(full.df$BsmtFinSF1)
+#which_na(full.df$BsmtFinSF2)
 ```
 
 Nous remarquons que les deux valeurs manquantes se trouvent sur la même ligne.
@@ -534,8 +534,8 @@ La valeur renvoyée est 0. Cela veut dire qu'aucune erreur n'a été introduite.
 ### Variables BsmtFullBath et BsmtHalfBath
 
 ```{r}
-which_na(full.df$BsmtFullBath)
-which_na(full.df$BsmtHalfBath)
+#which_na(full.df$BsmtFullBath)
+#which_na(full.df$BsmtHalfBath)
 ```
 
 Les 2 valeurs manquantes se trouvent sur la ligne 2189.
@@ -552,3 +552,60 @@ full.df$BsmtHalfBath[is.na(full.df$BsmtHalfBath)] = 0
 ```
 
 Nous avons maintenant terminé avec l'ensemble des variables Bsmt.
+
+### Variable MSZoning
+
+```{r}
+which_na(full.df$MSZoning)
+```
+
+Nous avons 4 valeurs manquantes pour MSZoning. Nous allons tenter de comparer avec une ou plusieurs autres variables pour voir s'il existe une corrélation afin de pouvoir prédire les valeurs manquantes.
+
+```{r}
+table(full.df$MSZoning, full.df$Neighborhood, useNA = "always")
+```
+
+En comparant les variables MSZoning et Neighborhood, nous nous apercevons que 3 valeurs manquantes pour la variable MSZoning affichent la valeur IDOTRR pour Neighborhood et une valeur manquante affiche Mitchel.
+Grace à ces informations, nous allons pouvoir remplacer les valeurs manquantes. Pour la commune de IDOTTR, la valeur sera RM et pour Mitchel la valeur sera RL.
+
+```{r}
+full.df$Neighborhood[1916]
+full.df$Neighborhood[2217]
+full.df$Neighborhood[2251]
+full.df$Neighborhood[2905]
+```
+
+```{r}
+full.df$MSZoning[1916] <- "RM"
+full.df$MSZoning[2217] <- "RM"
+full.df$MSZoning[2251] <- "RM"
+full.df$MSZoning[2905] <- "RL"
+```
+
+### Variable Utilities
+
+```{r}
+which_na(full.df$Utilities)
+```
+
+Il existe deux valeurs manquantes pour cette variable.
+
+```{r}
+table(full.df$Utilities)
+```
+
+En regardant les valeurs indiquées par cette variable, nous remarquons que la variable Utilities prend toujours la valeur AllPub hormis pour une seule valeur. Nous pouvons donc remplacer les 2 valeurs manquantes par AllPub.
+
+```{r}
+full.df$Utilities[1916] <- "AllPub"
+full.df$Utilities[1946] <- "AllPub"
+```
+
+### Variables Exterior1st et Exterior2nd
+
+```{r}
+which_na(full.df$Exterior1st)
+which_na(full.df$Exterior2nd)
+```
+
+Les 2 valeurs manquantes se trouvent sur la ligne 2152.
