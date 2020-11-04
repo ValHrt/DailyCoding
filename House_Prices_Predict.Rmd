@@ -653,7 +653,7 @@ full.df$Exterior2nd[2152] <- "VinylSd"
 ### Variable Electrical
 
 ```{r}
-which_na(full.df$Electrical)
+#which_na(full.df$Electrical)
 ```
 
 La valeur manquante se situe ligne 1380. Nous allons tenter de trouver une méthode pour remplacer ce NA.
@@ -669,4 +669,26 @@ full.df$Electrical[1380] <- "SBrkr"
 ```
 
 ### Variable KitchenQual
+
+```{r}
+which_na(full.df$KitchenQual)
+```
+
+La valeur manquante se situe sur la ligne 1556. Nous devons maintenant trouver une méthode pour remplacer cette dernière.
+
+```{r}
+table(full.df$KitchenQual, full.df$OverallQual)
+```
+
+Nous voyons qu'il existe une corrélation entre la qualité globale de la maison OverallQual et la qualité de la cuisine KitchenQual. Nous allons donc regarder la ligne de la valeur manquante pour savoir ce qu'affiche la variable OverallQual.
+
+```{r}
+full.df$OverallQual[1556]
+```
+
+La valeur affichée est 5, nous remplacerons donc la valeur manquante de KitchenQual par TA.
+
+```{r}
+full.df$KitchenQual[1556] <- "TA"
+```
 
