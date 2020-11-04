@@ -556,13 +556,13 @@ Nous avons maintenant terminé avec l'ensemble des variables Bsmt.
 ### Variable MSZoning
 
 ```{r}
-which_na(full.df$MSZoning)
+#which_na(full.df$MSZoning)
 ```
 
 Nous avons 4 valeurs manquantes pour MSZoning. Nous allons tenter de comparer avec une ou plusieurs autres variables pour voir s'il existe une corrélation afin de pouvoir prédire les valeurs manquantes.
 
 ```{r}
-table(full.df$MSZoning, full.df$Neighborhood, useNA = "always")
+#table(full.df$MSZoning, full.df$Neighborhood, useNA = "always")
 ```
 
 En comparant les variables MSZoning et Neighborhood, nous nous apercevons que 3 valeurs manquantes pour la variable MSZoning affichent la valeur IDOTRR pour Neighborhood et une valeur manquante affiche Mitchel.
@@ -585,13 +585,13 @@ full.df$MSZoning[2905] <- "RL"
 ### Variable Utilities
 
 ```{r}
-which_na(full.df$Utilities)
+#which_na(full.df$Utilities)
 ```
 
 Il existe deux valeurs manquantes pour cette variable.
 
 ```{r}
-table(full.df$Utilities)
+#table(full.df$Utilities)
 ```
 
 En regardant les valeurs indiquées par cette variable, nous remarquons que la variable Utilities prend toujours la valeur AllPub hormis pour une seule valeur. Nous pouvons donc remplacer les 2 valeurs manquantes par AllPub.
@@ -604,8 +604,69 @@ full.df$Utilities[1946] <- "AllPub"
 ### Variables Exterior1st et Exterior2nd
 
 ```{r}
-which_na(full.df$Exterior1st)
-which_na(full.df$Exterior2nd)
+#which_na(full.df$Exterior1st)
+#which_na(full.df$Exterior2nd)
 ```
 
 Les 2 valeurs manquantes se trouvent sur la ligne 2152.
+
+```{r}
+#table(full.df$Exterior1st, full.df$Neighborhood)
+```
+
+Nous constatons que les revetements extérieurs des habitations dépendent en grande partie du lieu de résidence.
+
+```{r}
+#full.df$Neighborhood[2152]
+```
+
+Pour la commune Edwards, c'est le revêtement Wd Sdng qui est la valeur la plus représentée, toutefois d'autres valeurs reviennent souvent. Nous allons donc chercher un de combiner un autre moyen pour définir la valeur manquante avec certitude.
+
+```{r}
+#table(full.df$Exterior1st, full.df$Foundation, full.df$Neighborhood=="Edwards")
+```
+
+Nous remarquons qu'il est possible de faire un tri plus qualitatif en prenant en compte la variable Foundation.
+
+```{r}
+#full.df$Foundation[2152]
+```
+
+La valeur affichée est PConc. En prenant en compte la valeur Edwards pour Neighborhood et la valeur PConc pour Foundation, nous pouvons prédire que la valeur manquante pour Exterior1st est VinylSd.
+
+```{r}
+full.df$Exterior1st[2152] <- "VinylSd"
+```
+
+Nous allons maintenant regarder s'il existe une corrélation entre Exterior1st et Exterior2nd.
+
+```{r}
+#table(full.df$Exterior1st, full.df$Exterior2nd)
+```
+
+Il existe effectivement une relation entre ces deux variables. Nous pouvons donc remplacer la valeur manquante de la variable Exterior2nd par VinylSd.
+
+```{r}
+full.df$Exterior2nd[2152] <- "VinylSd"
+```
+
+### Variable Electrical
+
+```{r}
+which_na(full.df$Electrical)
+```
+
+La valeur manquante se situe ligne 1380. Nous allons tenter de trouver une méthode pour remplacer ce NA.
+
+```{r}
+#table(full.df$Electrical)
+```
+
+Nous remarquons que la majorité des valeurs pour cette variable est SBrkr. Nous allons donc remplacer la valeur manquante par cette dernière.
+
+```{r}
+full.df$Electrical[1380] <- "SBrkr"
+```
+
+### Variable KitchenQual
+
