@@ -671,24 +671,61 @@ full.df$Electrical[1380] <- "SBrkr"
 ### Variable KitchenQual
 
 ```{r}
-which_na(full.df$KitchenQual)
+#which_na(full.df$KitchenQual)
 ```
 
 La valeur manquante se situe sur la ligne 1556. Nous devons maintenant trouver une méthode pour remplacer cette dernière.
 
 ```{r}
-table(full.df$KitchenQual, full.df$OverallQual)
+#table(full.df$KitchenQual, full.df$OverallQual)
 ```
 
 Nous voyons qu'il existe une corrélation entre la qualité globale de la maison OverallQual et la qualité de la cuisine KitchenQual. Nous allons donc regarder la ligne de la valeur manquante pour savoir ce qu'affiche la variable OverallQual.
 
 ```{r}
-full.df$OverallQual[1556]
+#full.df$OverallQual[1556]
 ```
 
 La valeur affichée est 5, nous remplacerons donc la valeur manquante de KitchenQual par TA.
 
 ```{r}
 full.df$KitchenQual[1556] <- "TA"
+```
+
+### Variable Functional
+
+```{r}
+#which_na(full.df$Functional)
+```
+
+Les 2 valeurs manquantes se trouvent sur les lignes 2217 et 2474. Nous allons essayer de trouver une méthode pour remplacer ces deux valeurs.
+
+```{r}
+#table(full.df$Functional, full.df$OverallQual, full.df$OverallCond)
+```
+
+Nous remarquons qu'en étudiant trois variables, nous pouvons déduire la valeur manquante pour la variable Functional. Nous allons donc regarder les valeurs indiquées des variables OverallQual et OverallCond sur les lignes 2217 et 2474.
+
+```{r}
+full.df$OverallQual[2217]
+full.df$OverallCond[2217]
+
+full.df$OverallQual[2474]
+full.df$OverallCond[2474]
+```
+
+Pour la valeur manquante ligne 2217, nous remarquons qu'il n'existe aucun cas où OverallQual vaut 1 et OverallCond vaut 5. En revanche, nous voyons qu'il existe un cas où OverallQual vaut 2 et Overall Cond vaut 5, la valeur indiquée pour Functional est alors Typ.
+
+Pour la valeur manquante ligne 2474, il existe le cas de figure, toutefois, une seule valeur est renseignée et indique Typ. Toutes les autres valeurs pour OverallCond vaut 1 indiquent Maj1, Maj2 ou Sev. Nous allons donc choisir la valeur qui se trouve au milieu, à savoir Maj1.
+
+```{r}
+full.df$Functional[2217] <- "Typ"
+full.df$Functional[2474] <- "Maj1"
+```
+
+### Variable SaleType
+
+```{r}
+which_na(full.df$SaleType)
 ```
 
