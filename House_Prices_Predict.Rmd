@@ -707,11 +707,11 @@ Les 2 valeurs manquantes se trouvent sur les lignes 2217 et 2474. Nous allons es
 Nous remarquons qu'en étudiant trois variables, nous pouvons déduire la valeur manquante pour la variable Functional. Nous allons donc regarder les valeurs indiquées des variables OverallQual et OverallCond sur les lignes 2217 et 2474.
 
 ```{r}
-full.df$OverallQual[2217]
-full.df$OverallCond[2217]
+#full.df$OverallQual[2217]
+#full.df$OverallCond[2217]
 
-full.df$OverallQual[2474]
-full.df$OverallCond[2474]
+#full.df$OverallQual[2474]
+#full.df$OverallCond[2474]
 ```
 
 Pour la valeur manquante ligne 2217, nous remarquons qu'il n'existe aucun cas où OverallQual vaut 1 et OverallCond vaut 5. En revanche, nous voyons qu'il existe un cas où OverallQual vaut 2 et Overall Cond vaut 5, la valeur indiquée pour Functional est alors Typ.
@@ -727,5 +727,23 @@ full.df$Functional[2474] <- "Maj1"
 
 ```{r}
 which_na(full.df$SaleType)
+```
+
+La valeur manquante se situe sur la ligne 2490. Nous allons devoir trouver une méthode pour prédire la valeur manquante.
+
+```{r}
+table(full.df$SaleType, full.df$SaleCondition)
+```
+
+Nous pouvons voir que la majorité des valeurs indiquent WD. Toutefois, lorsque l'on croise les variables SaleType et SaleCondition, si SaleCondition indique Partial, alors la valeur la plus représentée est New.
+
+```{r}
+full.df$SaleCondition[2490]
+```
+
+La valeur indiquée pour la variable SaleCondition sur la ligne 2490 est Normal. Nous allons donc pouvoir remplacer la valeur manquante de SaleType par WD.
+
+```{r}
+full.df$SaleType[2490] <- "WD"
 ```
 
