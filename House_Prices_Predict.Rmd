@@ -760,11 +760,36 @@ Nous voyons qu'il reste 1459 valeurs manquantes. Ce qui correspond normalement �
 
 ```{r}
 sum(is.na(full.df$SalePrice & full.df$TrainData=="FALSE"))
+sum(is.na(full.df$SalePrice & full.df$TrainData=="TRUE"))
 ```
 
 Nous retrouvons bien les 1459 valeurs manquantes pour la variable SalePrice sur le jeu de données test.
 
 # Mise en place de l'algorithme pour trouver les valeurs de SalePrice
 
-Test de Boruta
+Test de Boruta / Il faut défaire les jeux de données test et train.
+
+```{r}
+train.df <- full.df[which(full.df$TrainData=="TRUE")]
+test.df <- full.df[which(full.df$TrainData=="FALSE")]
+```
+
+```{r cache=TRUE}
+set.seed(1234)
+boruta.full.df <- Boruta(SalePrice~., data = train.df, doTrace = 1)
+print(boruta.full.df)
+```
+
+```{r}
+plot(boruta.full.df)
+```
+
+```{r}
+getSelectedAttributes(boruta.full.df, withTentative = FALSE)
+```
+
+```{r}
+BorutaImportance <- attStats(boruta.full.df)
+print(BorutaImportance)
+```
 
