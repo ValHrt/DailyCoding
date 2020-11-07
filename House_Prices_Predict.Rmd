@@ -18,6 +18,7 @@ library(naniar) # to visualize missing data
 library(data.table) # to ?????????
 library(corrr) # pour les corrélations entre variables
 library(naniar) # trouver l'emplacement des NA
+library(Boruta) # trouver les variables importantes
 ```
 
 # Chargement du jeu de données
@@ -726,19 +727,19 @@ full.df$Functional[2474] <- "Maj1"
 ### Variable SaleType
 
 ```{r}
-which_na(full.df$SaleType)
+#which_na(full.df$SaleType)
 ```
 
 La valeur manquante se situe sur la ligne 2490. Nous allons devoir trouver une méthode pour prédire la valeur manquante.
 
 ```{r}
-table(full.df$SaleType, full.df$SaleCondition)
+#table(full.df$SaleType, full.df$SaleCondition)
 ```
 
 Nous pouvons voir que la majorité des valeurs indiquent WD. Toutefois, lorsque l'on croise les variables SaleType et SaleCondition, si SaleCondition indique Partial, alors la valeur la plus représentée est New.
 
 ```{r}
-full.df$SaleCondition[2490]
+#full.df$SaleCondition[2490]
 ```
 
 La valeur indiquée pour la variable SaleCondition sur la ligne 2490 est Normal. Nous allons donc pouvoir remplacer la valeur manquante de SaleType par WD.
@@ -746,4 +747,24 @@ La valeur indiquée pour la variable SaleCondition sur la ligne 2490 est Normal.
 ```{r}
 full.df$SaleType[2490] <- "WD"
 ```
+
+## Vérification de l'absence de NA dans le jeu de données
+
+Nous allons tout d'abord vérifier le nombre de valeurs manquantes pour le jeu de données global.
+
+```{r}
+sum(is.na(full.df))
+```
+
+Nous voyons qu'il reste 1459 valeurs manquantes. Ce qui correspond normalement à la variable prix de vente du jeu de données test.df. 
+
+```{r}
+sum(is.na(full.df$SalePrice & full.df$TrainData=="FALSE"))
+```
+
+Nous retrouvons bien les 1459 valeurs manquantes pour la variable SalePrice sur le jeu de données test.
+
+# Mise en place de l'algorithme pour trouver les valeurs de SalePrice
+
+Test de Boruta
 
