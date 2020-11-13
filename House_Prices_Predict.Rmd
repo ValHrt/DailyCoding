@@ -219,8 +219,8 @@ Sur la ligne 2577, toutes les variables relatives au Garage indiquent l'absence 
 
 ```{r}
 full.df$GarageType[2577] <- "Abs"
-full.df$GarageCars[is.na(full.df$GarageCars)] = "Abs"
-full.df$GarageArea[is.na(full.df$GarageArea)] = "Abs"
+full.df$GarageCars[is.na(full.df$GarageCars)] = 0
+full.df$GarageArea[is.na(full.df$GarageArea)] = 0
 ```
 
 ### Variables MasVnrArea/MasVnrType

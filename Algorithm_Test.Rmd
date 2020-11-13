@@ -1,0 +1,20 @@
+---
+title: "Algorithm_Test"
+author: "Valentin Henriot"
+date: "11/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r message=FALSE}
+Train_Final <- read_csv("House_Price_Train.csv")
+Test_Final <- read_csv("House_Price_Test.csv")
+```
+
