@@ -774,7 +774,7 @@ train.df <- full.df[which(full.df$TrainData=="TRUE")]
 test.df <- full.df[which(full.df$TrainData=="FALSE")]
 ```
 
-```{r cache=TRUE}
+```{r eval=FALSE, cache=TRUE, include=FALSE}
 set.seed(1234)
 boruta.full.df <- Boruta(SalePrice~., data = train.df, doTrace = 1)
 print(boruta.full.df)
@@ -791,5 +791,12 @@ getSelectedAttributes(boruta.full.df, withTentative = FALSE)
 ```{r}
 BorutaImportance <- attStats(boruta.full.df)
 print(BorutaImportance)
+```
+
+Exportation du fichier pour l'utiliser sur un nouveau document.
+
+```{r}
+write.csv(train.df, "House_Price_Train.csv", row.names = FALSE)
+write.csv(test.df, "House_Price_Test.csv", row.names = FALSE)
 ```
 
