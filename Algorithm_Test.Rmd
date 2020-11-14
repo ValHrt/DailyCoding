@@ -9,12 +9,26 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r message=FALSE}
 library(tidyverse)
+library(DescTools)
+library(randomForest)
 ```
 
 ```{r message=FALSE}
 Train_Final <- read_csv("House_Price_Train.csv")
 Test_Final <- read_csv("House_Price_Test.csv")
+```
+
+```{r}
+Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + `1stFlrSF` + `2ndFlrSF` + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional +   
+Fireplaces + FireplaceQu + GarageType + GarageYrBlt + GarageFinish + GarageCars + GarageArea +    GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
+
+Model_Formula <- as.formula(Model_Equation)
+```
+
+```{r}
+set.seed(4321)
+Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 1000)
 ```
 
