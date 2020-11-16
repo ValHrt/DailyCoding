@@ -20,14 +20,46 @@ Train_Final <- read_csv("House_Price_Train.csv")
 Test_Final <- read_csv("House_Price_Test.csv")
 ```
 
-```{r}
-Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + 1stFlrSF + 2ndFlrSF + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageYrBlt + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
+# Changement des noms de variables
 
-Model_Formula <- as.formula(Model_Equation) # Bug sur ce code
+```{r include=FALSE}
+Train_Final <- Train_Final %>% rename(FirstFlrSF = `1stFlrSF`,
+                       SecondFlrSF = `2ndFlrSF`)
+
+Test_Final <- Test_Final %>% rename(FirstFlrSF = `1stFlrSF`,
+                       SecondFlrSF = `2ndFlrSF`)
 ```
 
+# Mise en place de l'équation avec les variables importantes
+
 ```{r}
+Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + FirstFlrSF + SecondFlrSF + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
+
+Model_Formula <- as.formula(Model_Equation) 
+```
+
+# Passage des variables textes en facteurs
+
+```{r}
+factor_cols <- c("MSZoning", "LotShape", "LandContour", "Neighborhood", "BldgType", "HouseStyle", "Exterior1st", "Exterior2nd", "MasVnrType", "ExterQual", "Foundation", "BsmtQual", "BsmtCond", "BsmtFinType1", "BsmtFinType2", "HeatingQC", "CentralAir", "Electrical", "KitchenQual", "Functional", "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond", "PavedDrive", "SaleCondition") # GarageYrBlt retiré car trop de catégories au sein de la variable
+
+Train_Final[factor_cols] <- lapply(Train_Final[factor_cols], as.factor)
+Test_Final[factor_cols] <- lapply(Test_Final[factor_cols], as.factor)
+```
+
+# Lancement de RandomForest
+
+```{r cache=TRUE}
 set.seed(4321)
 Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 1000)
 ```
 
+```{r}
+Model$importance
+```
+
+```{r}
+varImpPlot(Model)
+```
+
+Voir pour tester sur le jeu de données Train pour comparer entre valeur prédite et valeur réelle.
