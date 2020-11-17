@@ -49,9 +49,12 @@ Test_Final[factor_cols] <- lapply(Test_Final[factor_cols], as.factor)
 
 # Lancement de RandomForest
 
+1er test avec 1000 arbres
+2nd test avec 400 arbres
+
 ```{r cache=TRUE}
 set.seed(4321)
-Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 1000)
+Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 400)
 ```
 
 ```{r}
@@ -101,3 +104,14 @@ levels(Test_Final$GarageQual) <- union(levels(Train_Final$GarageQual), levels(Te
 Test_Final$PredictPrice <- predict(Model, Test_Final)
 ```
 Reste à exporter le fichier et poster sur Kaggle
+
+```{r}
+Id <- Test_Final$Id
+FinalDF <- as.data.frame(Id)
+
+FinalDF$SalePrice <- Test_Final$PredictPrice
+
+write.csv(FinalDF, "Kaggle_Submission2.csv", row.names = FALSE)
+```
+
+Voir pour additioner les variables indiquant la surface habitable (FirstFl et SecondFl)
