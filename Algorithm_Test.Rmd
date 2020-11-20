@@ -33,7 +33,7 @@ Test_Final <- Test_Final %>% rename(FirstFlrSF = `1stFlrSF`,
 # Mise en place de l'équation avec les variables importantes
 
 ```{r}
-Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + FirstFlrSF + SecondFlrSF + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
+Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + FirstFlrSF + SecondFlrSF + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition + Alley + BsmtExposure + Condition1 + EnclosedPorch + LandSlope" # Alley, BsmtExposure, Condition1, EnclosedPorch, LandSlope rajoutés
 
 Model_Formula <- as.formula(Model_Equation) 
 ```
@@ -41,7 +41,7 @@ Model_Formula <- as.formula(Model_Equation)
 # Passage des variables textes en facteurs
 
 ```{r}
-factor_cols <- c("MSZoning", "LotShape", "LandContour", "Neighborhood", "BldgType", "HouseStyle", "Exterior1st", "Exterior2nd", "MasVnrType", "ExterQual", "Foundation", "BsmtQual", "BsmtCond", "BsmtFinType1", "BsmtFinType2", "HeatingQC", "CentralAir", "Electrical", "KitchenQual", "Functional", "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond", "PavedDrive", "SaleCondition") # GarageYrBlt retiré car trop de catégories au sein de la variable
+factor_cols <- c("MSZoning", "LotShape", "LandContour", "Neighborhood", "BldgType", "HouseStyle", "Exterior1st", "Exterior2nd", "MasVnrType", "ExterQual", "Foundation", "BsmtQual", "BsmtCond", "BsmtFinType1", "BsmtFinType2", "HeatingQC", "CentralAir", "Electrical", "KitchenQual", "Functional", "FireplaceQu", "GarageType", "GarageFinish", "GarageQual", "GarageCond", "PavedDrive", "SaleCondition", "Alley", "BsmtExposure", "Condition1", "LandSlope") # Alley, BsmtExposure, Condition1, LandSlope rajoutés
 
 Train_Final[factor_cols] <- lapply(Train_Final[factor_cols], as.factor)
 Test_Final[factor_cols] <- lapply(Test_Final[factor_cols], as.factor)
@@ -51,10 +51,12 @@ Test_Final[factor_cols] <- lapply(Test_Final[factor_cols], as.factor)
 
 1er test avec 1000 arbres
 2nd test avec 400 arbres
+3eme test avec 1000 arbres + rajout des variables Alley, BsmtExposure, Condition1, EnclosedPorch,
+LandSlope 
 
 ```{r cache=TRUE}
 set.seed(4321)
-Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 1000)
+Model <- randomForest(formula=Model_Formula, data = Train_Final, ntree = 1200)
 ```
 
 ```{r}
@@ -111,7 +113,7 @@ FinalDF <- as.data.frame(Id)
 
 FinalDF$SalePrice <- Test_Final$PredictPrice
 
-write.csv(FinalDF, "Kaggle_Submission2.csv", row.names = FALSE)
+write.csv(FinalDF, "Kaggle_Submission4.csv", row.names = FALSE)
 ```
 
 Voir pour additioner les variables indiquant la surface habitable (FirstFl et SecondFl)

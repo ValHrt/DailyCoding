@@ -88,13 +88,6 @@ mean(Train_Final$RatioPricePredict)
 sd(Train_Final$RatioPricePredict)
 ```
 
-Vérifier les variables en facteur pour corriger.
-HouseStyle 7 au lieu de 8
-Exterior1st 13 au lieu de 15
-Exterior2nd 15 au lieu de 16
-Electrical 4 au lieu de 5
-GarageQual 5 au lieu de 6
-
 ```{r}
 levels(Test_Final$HouseStyle) <- union(levels(Train_Final$HouseStyle), levels(Test_Final$HouseStyle))
 
