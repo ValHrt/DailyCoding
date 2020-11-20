@@ -1,13 +1,15 @@
 ---
-title: "Algorithm_Test"
+title: "Algorithm_Test2"
 author: "Valentin Henriot"
-date: "11/13/2020"
+date: "11/20/2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+Meme document que Algorithm_Test mais changement sur les variables 1stFlrsf et 2ndFlrsf pour les transformer en une seule et meme variable.
 
 ```{r message=FALSE}
 library(tidyverse)
@@ -30,10 +32,15 @@ Test_Final <- Test_Final %>% rename(FirstFlrSF = `1stFlrSF`,
                        SecondFlrSF = `2ndFlrSF`)
 ```
 
+```{r}
+Train_Final$FlrTotal <- Train_Final$FirstFlrSF + Train_Final$SecondFlrSF
+Test_Final$FlrTotal <- Test_Final$FirstFlrSF + Test_Final$SecondFlrSF
+```
+
 # Mise en place de l'équation avec les variables importantes
 
 ```{r}
-Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + FirstFlrSF + SecondFlrSF + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
+Model_Equation <- "SalePrice ~ MSSubClass + MSZoning + LotFrontage + LotArea + LotShape + LandContour +   Neighborhood + BldgType + HouseStyle + OverallQual  + OverallCond + YearBuilt + YearRemodAdd  + Exterior1st + Exterior2nd +  MasVnrType + MasVnrArea + ExterQual + Foundation + BsmtQual + BsmtCond + BsmtFinType1 + BsmtFinSF1 + BsmtFinType2 + BsmtUnfSF + TotalBsmtSF +  HeatingQC + CentralAir + Electrical + FlrTotal + GrLivArea + BsmtFullBath + FullBath + HalfBath + BedroomAbvGr + KitchenAbvGr + KitchenQual + TotRmsAbvGrd + Functional + Fireplaces + FireplaceQu + GarageType + GarageFinish + GarageCars + GarageArea + GarageQual + GarageCond + PavedDrive + WoodDeckSF + OpenPorchSF + SaleCondition"
 
 Model_Formula <- as.formula(Model_Equation) 
 ```
@@ -103,7 +110,6 @@ levels(Test_Final$GarageQual) <- union(levels(Train_Final$GarageQual), levels(Te
 ```{r}
 Test_Final$PredictPrice <- predict(Model, Test_Final)
 ```
-Reste à exporter le fichier et poster sur Kaggle
 
 ```{r}
 Id <- Test_Final$Id
@@ -111,7 +117,6 @@ FinalDF <- as.data.frame(Id)
 
 FinalDF$SalePrice <- Test_Final$PredictPrice
 
-write.csv(FinalDF, "Kaggle_Submission2.csv", row.names = FALSE)
+write.csv(FinalDF, "Kaggle_Submission3.csv", row.names = FALSE)
 ```
 
-Voir pour additioner les variables indiquant la surface habitable (FirstFl et SecondFl)
